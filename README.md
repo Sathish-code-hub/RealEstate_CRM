@@ -1,69 +1,79 @@
-# Real Estate CRM (MERN)
+# EstateCRM: Real Estate CRM
 
-Lead management, property inventory and a booking flow for a real estate sales team.
+A small CRM where a sales team manages leads and property bookings.
 
-**Stack:** MongoDB + Mongoose · Express · React (Vite) · Node · Tailwind CSS · lucide-react
+**Live app:** https://real-estate-crm-five-alpha.vercel.app
+**API:** https://realestate-crm-dhxz.onrender.com/api/health
 
-## Setup
+**Demo logins**
+- Admin: `admin@crm.com` / `admin123`
+- Sales: `asha@crm.com` / `sales123`
 
+> The API runs on a free Render plan, so the first request after idle time can take 30–60 seconds.
+
+## Tech stack
+MongoDB, Express, React (Vite), Node.js, Tailwind CSS, lucide-react
+
+## Features
+- Login with Admin and Sales Employee roles
+- Leads: create, edit, search, filter, view, notes, follow-up dates
+- Stages: New, Contacted, Site Visit, Interested, Negotiation, Booked, Lost
+- Admin assigns leads to sales employees
+- Properties: projects, buildings and units with price, type and availability
+- Booking flow that connects a lead to a unit, with cancel
+- Dashboard: leads by stage, follow-ups due, bookings this month, inventory
+- Responsive UI with loading, empty and error states
+
+## Run locally
+
+**Server**
 ```bash
-# 1. API
 cd server
-cp .env     
+cp .env.example .env     # add MONGO_URI and JWT_SECRET
 npm install
-npm run seed            
-npm run dev               
-
-# 2. Client (new terminal)
-cd client
-cp .env.        
-npm install
-npm run dev                
+npm run seed             # demo data
+npm run dev              # http://localhost:5000
 ```
 
-Demo logins: `admin@crm.com / admin123` (Admin) · `asha@crm.com / sales123` (Sales)
-
-## Deployment
-- Database: MongoDB Atlas (free tier)
-- API: Render / Railway. Env vars: `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` (the client URL)
-- Client: Vercel / Netlify. Env var: `VITE_API_URL` (the API URL + `/api`). Add an SPA rewrite to `index.html`.
-
-Live URL: _add here_
+**Client**
+```bash
+cd client
+cp .env.example .env     # VITE_API_URL=http://localhost:5000/api
+npm install
+npm run dev              # http://localhost:5173
+```
 
 ## Database overview
-| Collection | Key fields | Relations |
+| Collection | Purpose | Relations |
 |---|---|---|
-| User | name, email, password (hashed), role (admin/sales), active | |
-| Lead | name, phone (unique), email, source, budget, stage, followUpDate, notes[] | assignedTo → User, createdBy → User |
-| Project | name, location | |
-| Building | name, floors | project → Project |
-| Unit | unitNumber, type, floor, areaSqft, price, status | project, building |
-| Booking | price (snapshot), tokenAmount, status (active/cancelled) | lead, unit, bookedBy → User |
+| User | Team members and roles | |
+| Lead | Customer, stage, notes, follow-up date | assignedTo → User |
+| Project | Real estate project | |
+| Building | Building in a project | project → Project |
+| Unit | Price, type, availability | project, building |
+| Booking | Links a lead to a unit | lead, unit, bookedBy → User |
 
-Indexes that enforce rules: unique `Lead.phone`, unique `(building, unitNumber)`, and a **partial unique index on `Booking.unit` where `status = active`**.
+## API overview
+All routes except login need the header `Authorization: Bearer <token>`.
 
-## API overview (all routes except login need `Authorization: Bearer <token>`)
-| Method | Route | Access |
-|---|---|---|
-| POST | `/api/auth/login` · GET `/api/auth/me` | public / any |
-| GET/POST/PATCH | `/api/users` | admin |
-| GET | `/api/leads?search&stage&followUp&assignedTo&page` | admin: all, sales: own |
-| POST | `/api/leads` | any |
-| GET/PATCH | `/api/leads/:id` | admin / owner |
-| POST | `/api/leads/:id/notes` | admin / owner |
-| GET | `/api/properties/projects` · `/buildings` · `/units` | any |
-| POST | `/api/properties/projects` · `/buildings` · `/units` · PATCH `/units/:id` | admin |
-| GET | `/api/bookings` | admin: all, sales: own |
-| POST | `/api/bookings` | admin / lead owner |
-| PATCH | `/api/bookings/:id/cancel` | admin / booking owner |
-| GET | `/api/dashboard` | any (scoped by role) |
+| Route | Access |
+|---|---|
+| `POST /api/auth/login`, `GET /api/auth/me` | Public / any user |
+| `/api/users` | Admin |
+| `/api/leads` (list, create, view, edit, notes) | Admin: all leads, Sales: own leads |
+| `/api/properties/projects`, `/buildings`, `/units` | Read: any user, Create: Admin |
+| `/api/bookings` (list, create, cancel) | Admin: all, Sales: own |
+| `GET /api/dashboard` | Any user, scoped by role |
 
 ## Key decisions
-1. **Double booking is prevented at two levels.** Booking first runs an atomic `findOneAndUpdate({status:'available'} → 'booked')`. Only one concurrent request can win; the loser gets a `409`. A partial unique index on active bookings is the database-level safety net, and a failed booking rolls the unit back. The UI refreshes the unit list on a 409. (On Atlas replica sets this could also use transactions.)
-2. **Sales employees only see their own leads/bookings; the API enforces it, not just the UI.** Admins see everything and are the only ones who can reassign leads or manage properties and users. Sales-created leads are auto-assigned to them.
-3. **"Booked" can only be set through the booking flow.** Manually setting it is rejected, and a booked lead can't change stage until the booking is cancelled. Cancelling frees the unit and moves the lead back to Negotiation. This keeps lead stage, unit status and bookings consistent.
-4. **Unit status is never editable directly** and the booking stores a **price snapshot**, so later price edits don't change past bookings.
-5. **Duplicate leads are blocked** (unique normalised phone number) and follow-ups drive the dashboard (today / overdue), because that is what a sales team checks first every morning.
+1. **No double booking.** A booking atomically changes a unit from available to booked, so only one request can win and the other gets an error. A unique database index on active bookings is a second safety net.
+2. **Permissions are enforced in the API.** Sales employees only see and book their own leads. Only admins manage properties, users and lead assignment.
+3. **"Booked" only comes from the booking flow.** This keeps lead stage, unit status and bookings in sync. Cancelling a booking frees the unit and moves the lead back to Negotiation.
+4. **Booking stores a price snapshot,** and unit status can't be edited directly, so later price changes don't affect past bookings.
+5. **Duplicate leads are blocked** by a unique phone number, and the dashboard highlights today's and overdue follow-ups, which is what a sales team checks first.
 
-## Known limitations / next steps
-Follow-up "today" uses server time zone; no email/WhatsApp reminders; no audit log of stage changes; no automated tests yet.
+## Deployment
+Database on MongoDB Atlas, API on Render, client on Vercel.
+
+## Limitations
+No reminders by email, no stage-change history, no automated tests yet.
