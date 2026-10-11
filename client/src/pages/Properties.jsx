@@ -39,14 +39,11 @@ export default function Properties() {
       {projects.loading ? <Spinner /> : projects.error ? <ErrorState message={projects.error} onRetry={projects.reload} /> : (
         <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.data.map((p) => (
-            <button
-              key={p._id}
-              onClick={() => setFilters({ ...filters, project: filters.project === p._id ? '' : p._id, building: '' })}
-              className={`${card} p-4 text-left ${filters.project === p._id ? 'border-indigo-500 ring-1 ring-indigo-500' : 'hover:bg-slate-50'}`}
-            >
+            <button key={p._id} onClick={() => setFilters({ ...filters, project: filters.project === p._id ? '' : p._id, building: '' })}
+              className={`${card} p-4 text-left ${filters.project === p._id ? 'border-indigo-500 ring-1 ring-indigo-500' : 'hover:bg-slate-50'}`}>
               <p className="flex items-center gap-2 font-semibold"><Building2 className="h-4 w-4 text-indigo-600" /> {p.name}</p>
               <p className="mt-1 flex items-center gap-1 text-xs text-slate-500"><MapPin className="h-3 w-3" /> {p.location}</p>
-              <p className="mt-3 text-sm"><span className="font-medium text-emerald-600">{p.available} available</span> · {p.booked} booked</p>
+              <p className="mt-3 text-sm"><span className="font-medium">{p.available} available</span> · {p.booked} booked</p>
             </button>
           ))}
         </div>

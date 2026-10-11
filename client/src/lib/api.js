@@ -11,7 +11,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // Expired / invalid session -> back to login
     if (err.response?.status === 401 && !err.config.url.includes('/auth/login')) {
       localStorage.removeItem('token');
       window.location.href = '/login';
@@ -22,7 +21,7 @@ api.interceptors.response.use(
 
 export const errMsg = (e) => {
   const d = e.response?.data;
-  if (d?.details?.length) return d.details.map((x) => `${x.field}: ${x.message}`).join(' · ');
+  if (d?.details?.length) return d.details.map((x) =>  `${x.message}`).join(' · ');
   return d?.message || (e.request ? 'Cannot reach the server. Check your connection.' : e.message) || 'Something went wrong';
 };
 

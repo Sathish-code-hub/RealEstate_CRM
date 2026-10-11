@@ -87,8 +87,8 @@ export default function LeadDetail() {
           </div>
 
           {booking && (
-            <div className={`${card} space-y-1 border-emerald-200 bg-emerald-50 p-4 text-sm`}>
-              <h2 className="font-semibold text-emerald-800">Booked unit</h2>
+            <div className={`${card} space-y-1 bg-slate-50 p-4 text-sm`}>
+              <h2 className="font-semibold">Booked unit</h2>
               <p>{booking.unit.project?.name} · {booking.unit.building?.name} · {booking.unit.unitNumber}</p>
               <p>{money(booking.price)} (token {money(booking.tokenAmount)})</p>
               <p className="text-xs text-slate-500">Booked on {fmtDate(booking.bookingDate)}</p>
