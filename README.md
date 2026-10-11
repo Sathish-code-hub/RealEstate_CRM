@@ -1,4 +1,4 @@
-# EstateCRM: Real Estate CRM
+# Real Estate CRM
 
 A small CRM where a sales team manages leads and property bookings.
 
