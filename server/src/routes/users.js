@@ -5,7 +5,7 @@ import { protect, requireRole } from '../middleware/auth.js';
 import { ApiError, asyncHandler, validate } from '../utils/http.js';
 
 const router = Router();
-router.use(protect, requireRole('admin')); // team management is admin only
+router.use(protect, requireRole('admin')); // admin
 
 const createSchema = z.object({
   name: z.string().trim().min(2),

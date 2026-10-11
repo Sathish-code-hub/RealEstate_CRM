@@ -20,7 +20,6 @@ export default function Leads() {
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
 
-  // debounce the search box
   useEffect(() => {
     const t = setTimeout(() => { setFilters((f) => ({ ...f, search: text })); setPage(1); }, 350);
     return () => clearTimeout(t);

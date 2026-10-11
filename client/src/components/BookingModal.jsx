@@ -52,12 +52,8 @@ export default function BookingModal({ lead, onClose, onBooked }) {
             ) : (
               <div className="grid max-h-56 gap-2 overflow-y-auto sm:grid-cols-2">
                 {units.data?.map((u) => (
-                  <button
-                    type="button"
-                    key={u._id}
-                    onClick={() => setUnitId(u._id)}
-                    className={`rounded-lg border p-3 text-left text-sm ${unitId === u._id ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:bg-slate-50'}`}
-                  >
+                  <button type="button" key={u._id} onClick={() => setUnitId(u._id)}
+                    className={`rounded-lg border p-3 text-left text-sm ${unitId === u._id ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:bg-slate-50'}`}>
                     <p className="font-medium">{u.unitNumber} · {u.type}</p>
                     <p className="text-xs text-slate-500">Floor {u.floor ?? '—'} · {u.areaSqft ?? '—'} sqft</p>
                     <p className="mt-1 font-medium text-indigo-700">{money(u.price)}</p>

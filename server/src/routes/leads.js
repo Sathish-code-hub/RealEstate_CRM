@@ -10,7 +10,7 @@ import { STAGES, SOURCES } from '../constants.js';
 const router = Router();
 router.use(protect);
 
-// Admin sees everything, sales only sees leads assigned to them
+//admin
 const scope = (user) => (user.role === 'admin' ? {} : { assignedTo: user._id });
 const escapeRx = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -37,7 +37,7 @@ async function assertAssignable(userId) {
   if (!u || !u.active) throw new ApiError(400, 'Selected employee is not available');
 }
 
-// LIST: search, filters, pagination
+//search, filters, pagination
 router.get('/', asyncHandler(async (req, res) => {
   const { search, stage, assignedTo, followUp, page = 1, limit = 10 } = req.query;
   const q = { ...scope(req.user) };
@@ -68,12 +68,11 @@ router.get('/', asyncHandler(async (req, res) => {
   res.json({ items, total, page: p, pages: Math.ceil(total / l) || 1 });
 }));
 
-// CREATE
+// create
 router.post('/', validate(leadSchema), asyncHandler(async (req, res) => {
   const data = req.body;
   if (data.stage === 'Booked') throw new ApiError(400, 'Use the booking flow to mark a lead as Booked');
 
-  // Sales employees always own the leads they create; admins can pick (or leave unassigned)
   data.assignedTo = req.user.role === 'admin' ? data.assignedTo || null : req.user._id;
   await assertAssignable(data.assignedTo);
 
@@ -81,7 +80,6 @@ router.post('/', validate(leadSchema), asyncHandler(async (req, res) => {
   res.status(201).json(lead);
 }));
 
-// DETAIL (+ active booking if any)
 router.get('/:id', asyncHandler(async (req, res) => {
   const lead = await Lead.findOne({ _id: req.params.id, ...scope(req.user) })
     .populate('assignedTo', 'name')
@@ -95,7 +93,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
   res.json({ lead, booking });
 }));
 
-// UPDATE
+// update
 router.patch('/:id', validate(leadSchema.partial()), asyncHandler(async (req, res) => {
   const lead = await Lead.findOne({ _id: req.params.id, ...scope(req.user) });
   if (!lead) throw new ApiError(404, 'Lead not found');
@@ -116,7 +114,6 @@ router.patch('/:id', validate(leadSchema.partial()), asyncHandler(async (req, re
   res.json(lead);
 }));
 
-// ADD NOTE
 router.post('/:id/notes', validate(z.object({ text: z.string().trim().min(1, 'Write a note first').max(1000) })), asyncHandler(async (req, res) => {
   const lead = await Lead.findOne({ _id: req.params.id, ...scope(req.user) });
   if (!lead) throw new ApiError(404, 'Lead not found');

@@ -24,8 +24,7 @@ export function BuildingForm({ projects, onSaved, onCancel }) {
     <Form
       onSubmit={async () => { await api.post('/properties/buildings', { ...f, floors: f.floors || undefined }); onSaved(); }}
       onCancel={onCancel}
-      submitLabel="Add building"
-    >
+      submitLabel="Add building">
       <Select label="Project" required value={f.project} onChange={set('project')}>
         <option value="">Select project</option>
         {projects.map((p) => <option key={p._id} value={p._id}>{p.name}</option>)}

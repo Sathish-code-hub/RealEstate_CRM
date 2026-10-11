@@ -5,7 +5,6 @@ import { Input, Select } from './ui/Field';
 import { SOURCES, STAGES } from '../lib/constants';
 import { toInputDate } from '../lib/format';
 
-// Used for both "new lead" and "edit lead"
 export default function LeadForm({ lead, team = [], isAdmin, onSaved, onCancel }) {
   const [f, setF] = useState({
     name: lead?.name || '',

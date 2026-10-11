@@ -11,7 +11,6 @@ const router = Router();
 router.use(protect);
 const admin = requireRole('admin');
 
-// ---- Projects (with availability stats)
 router.get('/projects', asyncHandler(async (req, res) => {
   const [projects, stats] = await Promise.all([
     Project.find().sort({ name: 1 }).lean(),
@@ -33,7 +32,7 @@ router.post('/projects', admin, validate(z.object({
   res.status(201).json(await Project.create(req.body));
 }));
 
-// ---- Buildings
+// Buildings
 router.get('/buildings', asyncHandler(async (req, res) => {
   const q = req.query.project ? { project: req.query.project } : {};
   res.json(await Building.find(q).sort({ name: 1 }).lean());
@@ -48,7 +47,7 @@ router.post('/buildings', admin, validate(z.object({
   res.status(201).json(await Building.create(req.body));
 }));
 
-// ---- Units
+// Units
 router.get('/units', asyncHandler(async (req, res) => {
   const { project, building, status, type, minPrice, maxPrice } = req.query;
   const q = {};
@@ -87,7 +86,6 @@ router.post('/units', admin, validate(z.object({
   res.status(201).json(await Unit.create({ ...req.body, project: building.project }));
 }));
 
-// Status is intentionally NOT editable here: only bookings change availability
 router.patch('/units/:id', admin, validate(z.object(unitFields).partial()), asyncHandler(async (req, res) => {
   const unit = await Unit.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
   if (!unit) throw new ApiError(404, 'Unit not found');

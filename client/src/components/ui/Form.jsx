@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Button from './Button';
 import { errMsg } from '../../lib/api';
 
-// Shared form shell: handles submit, loading and API error display
 export default function Form({ onSubmit, onCancel, submitLabel = 'Save', children }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');

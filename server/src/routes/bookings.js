@@ -28,7 +28,6 @@ router.post('/', validate(z.object({
 })), asyncHandler(async (req, res) => {
   const { leadId, unitId, tokenAmount } = req.body;
 
-  // Sales can only book for their own leads
   const scope = req.user.role === 'admin' ? {} : { assignedTo: req.user._id };
   const lead = await Lead.findOne({ _id: leadId, ...scope });
   if (!lead) throw new ApiError(404, 'Lead not found');
@@ -37,8 +36,6 @@ router.post('/', validate(z.object({
     throw new ApiError(409, 'This lead already has an active booking');
   }
 
-  // ATOMIC claim: only one request can flip available -> booked.
-  // A second user booking the same unit gets null here and a 409.
   const unit = await Unit.findOneAndUpdate({ _id: unitId, status: 'available' }, { status: 'booked' }, { new: true });
   if (!unit) throw new ApiError(409, 'Sorry, this unit is no longer available');
 
