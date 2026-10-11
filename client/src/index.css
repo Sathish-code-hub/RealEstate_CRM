@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+*{
+  font-family: "Outfit", sans-serif;
+}
+@layer base {
+  body { @apply bg-slate-50 text-slate-800 antialiased; }
+}
+
+button{
+  cursor: pointer;
+}
