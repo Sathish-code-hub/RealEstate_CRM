@@ -1,4 +1,4 @@
-# EstateCRM – Real Estate CRM (MERN)
+# Real Estate CRM (MERN)
 
 Lead management, property inventory and a booking flow for a real estate sales team.
 
