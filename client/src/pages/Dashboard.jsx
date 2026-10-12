@@ -24,8 +24,8 @@ export default function Dashboard() {
   const { user, isAdmin } = useAuth();
   const { data, loading, error, reload } = useFetch('/dashboard');
 
-  if (loading) return <Spinner />;
-  if (error) return <ErrorState message={error} onRetry={reload} />;
+  if (loading) return <Spinner/>;
+  if (error) return <ErrorState message={error} onRetry={reload}/>;
 
   const max = Math.max(1, ...Object.values(data.stages));
 

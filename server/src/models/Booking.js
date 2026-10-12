@@ -17,6 +17,6 @@ const bookingSchema = new Schema(
 );
 
 bookingSchema.index({ unit: 1 }, { unique: true, partialFilterExpression: { status: 'active' } });
-bookingSchema.index({ lead: 1, status: 1 });
+bookingSchema.index({ lead: 1, status: 1 })
 
-export default mongoose.model('Booking', bookingSchema);
+export default mongoose.model('Booking', bookingSchema)
