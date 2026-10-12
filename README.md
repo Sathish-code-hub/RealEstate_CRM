@@ -29,18 +29,18 @@ MongoDB, Express, React (Vite), Node.js, Tailwind CSS, lucide-react
 **Server**
 ```bash
 cd server
-cp .env.example .env     # add MONGO_URI and JWT_SECRET
+cp .env    
 npm install
-npm run seed             # demo data
-npm run dev              # http://localhost:5000
+npm run seed    
+npm run dev             
 ```
 
 **Client**
 ```bash
 cd client
-cp .env.example .env     # VITE_API_URL=http://localhost:5000/api
+cp .env    
 npm install
-npm run dev              # http://localhost:5173
+npm run dev              
 ```
 
 ## Database overview
